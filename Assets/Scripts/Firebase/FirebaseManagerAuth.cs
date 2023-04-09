@@ -4,8 +4,8 @@ using Firebase;
 using TMPro;
 using Firebase.Auth;
 using Firebase.Database;
-using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class FirebaseManagerAuth : MonoBehaviour
 {
@@ -22,6 +22,8 @@ public class FirebaseManagerAuth : MonoBehaviour
     public TMP_InputField passwordRegister;
     public TMP_InputField passwordRegisterConfirm;
     public TMP_Text warningRegister;
+    public Button showPasswordReg;
+    public TMP_Text showPasswordRegText;
 
     //Login 
     [Header("Login")]
@@ -29,10 +31,25 @@ public class FirebaseManagerAuth : MonoBehaviour
     public TMP_InputField passwordLogin;
     public TMP_Text warningLogin;
     public TMP_Text confirmLogin;
+    public Button showPasswordLog;
+    public TMP_Text showPasswordLogText;
 
-    
+    //User data
+    [Header("User")]
+    public TMP_InputField user;
+    public TMP_InputField points;
+    public GameObject score;
+    public Transform scoreBoardContent;
+
+
+    //Bools
+    [Header("Bools")]
+    public bool buttonPressed = false;
+
+
     void Start()
     {
+        //Change password input from **** to •••
         passwordRegister.inputType = TMP_InputField.InputType.Password;
         passwordRegister.asteriskChar = '•';
         passwordRegisterConfirm.inputType = TMP_InputField.InputType.Password;
@@ -41,7 +58,12 @@ public class FirebaseManagerAuth : MonoBehaviour
         passwordLogin.asteriskChar = '•';
     }
 
+    void Update()
+    {
+        ButtonDownPasswordLogin();
+        ButtonUpPasswordLogin();
 
+    }
 
     void Awake()
     {
@@ -77,6 +99,56 @@ public class FirebaseManagerAuth : MonoBehaviour
     {
         //Call the register coroutine passing the email, password, and username
         StartCoroutine(Register(emailRegister.text, passwordRegister.text, usernameRegister.text));
+    }
+    public void SignOutButton()
+    {
+        auth.SignOut();
+        UiManager.instance.LoginTab();
+        ClearRegisterFeilds();
+        ClearLoginFeilds();
+    }
+
+    public void ClearLoginFeilds()
+    {
+        emailLogin.text = "";
+        passwordLogin.text = "";
+    }
+    public void ClearRegisterFeilds()
+    {
+        usernameRegister.text = "";
+        emailRegister.text = "";
+        passwordRegister.text = "";
+        passwordRegisterConfirm.text = "";
+    }
+
+    public void ButtonDownPasswordLogin()
+    {
+        if(buttonPressed)
+        {
+            passwordLogin.contentType = TMP_InputField.ContentType.Standard;
+            passwordLogin.ForceLabelUpdate();
+            showPasswordLogText.text = "Release to hide the password";
+        }
+    }
+
+    public void ButtonUpPasswordLogin()
+    {
+        if (!buttonPressed)
+        {
+            passwordLogin.contentType = TMP_InputField.ContentType.Password;
+            passwordLogin.ForceLabelUpdate();
+            showPasswordLogText.text = "Press to the show Password";
+        }
+    }
+
+    public void ButtonIsPressed()
+    {
+            buttonPressed= true;
+    }
+
+    public void ButtonIsNotPressed()
+    {
+            buttonPressed= false;
     }
 
     private IEnumerator Login(string _email, string _password)
@@ -125,7 +197,7 @@ public class FirebaseManagerAuth : MonoBehaviour
             yield return new WaitForSeconds(1);
             confirmLogin.text = "Loading profile";
             yield return new WaitForSeconds(2);
-            SceneManager.LoadScene("UserProfile");
+            UiManager.instance.UserProfileTab();
 
         }
     }
@@ -155,7 +227,7 @@ public class FirebaseManagerAuth : MonoBehaviour
                 FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
                 AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
-                string message = "Register Failed!";
+                string message = "Register failed, invalid E-mail adress! (example@example.com)";
                 switch (errorCode)
                 {
                     case AuthError.MissingEmail:
@@ -200,9 +272,11 @@ public class FirebaseManagerAuth : MonoBehaviour
                     else
                     {
                         //Username is  set
-                        //Return to login screen
-                        UiManager.instance.LoginScreen();
+                        //Return to login tab and insert e-mail
+                        UiManager.instance.LoginTab();
                         warningRegister.text = "";
+                        confirmLogin.text = "Your accound was create, Login!";
+                        emailLogin.text = _email;
                     }
                 }
             }

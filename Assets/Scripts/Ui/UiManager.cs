@@ -6,8 +6,10 @@ public class UiManager : MonoBehaviour
 {
     public static UiManager instance;
 
-    public GameObject loginUI;
-    public GameObject registerUI;
+    public GameObject loginTab;
+    public GameObject registerTab;
+    public GameObject userProfileTab;
+    //public GameObject scoreboardTab;
 
     private void Awake()
     {
@@ -22,14 +24,34 @@ public class UiManager : MonoBehaviour
         }
     }
 
-    public void LoginScreen() 
+    public void disableAllTabs()
     {
-        loginUI.SetActive(true);
-        registerUI.SetActive(false);
+        loginTab.SetActive(false);
+        registerTab.SetActive(false);
+        userProfileTab.SetActive(false);
+        //scoreboardTab.SetActive(false);
     }
-    public void RegisterScreen() 
+
+    public void LoginTab() 
     {
-        loginUI.SetActive(false);
-        registerUI.SetActive(true);
+        disableAllTabs();
+        loginTab.SetActive(true);
     }
+    public void RegisterTab() 
+    {
+        disableAllTabs();
+        registerTab.SetActive(true);
+    }
+
+    public void UserProfileTab()
+    {
+        disableAllTabs();
+        userProfileTab.SetActive(true);
+    }
+
+    /*public void ScoreboardTab()
+    {
+        disableAllTabs();
+        scoreboardTab.SetActive(true);
+    }*/
 }
