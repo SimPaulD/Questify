@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "651157633454",
+    "project_id": "questify-caab1",
+    "storage_bucket": "questify-caab1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:651157633454:android:ebffbe57552386b992303f",
+        "android_client_info": {
+          "package_name": "com.bmcstudios.questify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "651157633454-dfnvg6canf6mbs9271j56dkggmr5q83d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCM3d3eR5Dm6-rnd7ggHcjJdj08xRs9-sE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "651157633454-dfnvg6canf6mbs9271j56dkggmr5q83d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
