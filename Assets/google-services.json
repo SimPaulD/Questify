@@ -1,5 +1,6 @@
 {
   "project_info": {
+    "firebase_url": "https://questify-caab1-default-rtdb.europe-west1.firebasedatabase.app/",
     "project_number": "651157633454",
     "project_id": "questify-caab1",
     "storage_bucket": "questify-caab1.appspot.com"

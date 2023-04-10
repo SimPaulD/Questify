@@ -9,7 +9,17 @@ public class UiManager : MonoBehaviour
     public GameObject loginTab;
     public GameObject registerTab;
     public GameObject userProfileTab;
-    //public GameObject scoreboardTab;
+    public GameObject accountTab;
+    public GameObject badgesTab;
+    public GameObject dashboardTab;
+    public GameObject leaderboardTab;
+    public GameObject questTab;
+    public GameObject settingsTab;
+
+    public void Start()
+    {
+        LoginTab();
+    }
 
     private void Awake()
     {
@@ -24,34 +34,73 @@ public class UiManager : MonoBehaviour
         }
     }
 
-    public void disableAllTabs()
+    public void disableAuthTabs()
     {
         loginTab.SetActive(false);
         registerTab.SetActive(false);
         userProfileTab.SetActive(false);
-        //scoreboardTab.SetActive(false);
+    }
+
+    public void disableAllTabs()
+    {
+        dashboardTab.SetActive(false);
+        questTab.SetActive(false);
+        badgesTab.SetActive(false);
+        leaderboardTab.SetActive(false);
+        accountTab.SetActive(false);
+        settingsTab.SetActive(false);
     }
 
     public void LoginTab() 
     {
-        disableAllTabs();
+        disableAuthTabs();
         loginTab.SetActive(true);
     }
     public void RegisterTab() 
     {
-        disableAllTabs();
+        disableAuthTabs();
         registerTab.SetActive(true);
     }
 
     public void UserProfileTab()
     {
-        disableAllTabs();
+        disableAuthTabs();
         userProfileTab.SetActive(true);
     }
 
-    /*public void ScoreboardTab()
+    public void DashboardTab()
     {
         disableAllTabs();
-        scoreboardTab.SetActive(true);
-    }*/
+        dashboardTab.SetActive(true);
+    }
+
+    public void QuestTab()
+    {
+        disableAllTabs();
+        questTab.SetActive(true);
+    }
+
+    public void BadgesTab()
+    {
+        disableAllTabs();
+        badgesTab.SetActive(true);
+    }
+
+    public void LeaderboardTab()
+    {
+        disableAllTabs();
+        leaderboardTab.SetActive(true);
+    }
+
+    public void AccountTab()
+    {
+        disableAllTabs();
+        accountTab.SetActive(true);
+    }
+
+    public void SettingsTab()
+    {
+        disableAllTabs();
+        settingsTab.SetActive(true);
+    }
 }
