@@ -42,13 +42,19 @@ public class FirebaseManagerAuth : MonoBehaviour
     public TMP_Text userPoints;
     public TMP_Text userScore;
 
+    [Header("Leaderboard")]
     public GameObject scoreObj;
     public Transform leaderboardContent;
+    public int placementNr;
 
+    [Header("AutoSave")]
+    private float saveTimer = 0f;
+    private float saveInterval = 5f;
 
     //Bools
     [Header("Bools")]
     public bool buttonPressed = false;
+    public bool isLoggedIn = false;
 
 
     void Start()
@@ -66,7 +72,26 @@ public class FirebaseManagerAuth : MonoBehaviour
     {
         ButtonDownPasswordLogin();
         ButtonUpPasswordLogin();
+        ButtonDownPasswordRegister();
+        ButtonUpPasswordRegister();
 
+        //Save the user stats every 30 sec
+        if (isLoggedIn)
+        {
+            saveTimer += Time.deltaTime;
+            //Debug.Log(saveTimer);
+            if (saveTimer >= saveInterval)
+            {
+                StartCoroutine(SaveUserStats());
+                StartCoroutine(LoadUserData());
+                StartCoroutine(LoadLeaderboardData());
+                saveTimer = 0f;
+            }
+        }
+        else
+        {
+            Debug.Log("Not connected");
+        }
     }
 
     void Awake()
@@ -126,6 +151,16 @@ public class FirebaseManagerAuth : MonoBehaviour
         passwordRegisterConfirm.text = "";
     }
 
+    public void ButtonIsPressed()
+    {
+        buttonPressed = true;
+    }
+
+    public void ButtonIsNotPressed()
+    {
+        buttonPressed = false;
+    }
+
     public void ButtonDownPasswordLogin()
     {
         if(buttonPressed)
@@ -146,34 +181,43 @@ public class FirebaseManagerAuth : MonoBehaviour
         }
     }
 
-    public void LeaderboardButton()
+    public void ButtonDownPasswordRegister()
     {
-        StartCoroutine(LoadLeaderboardData());
+        if (buttonPressed)
+        {
+            passwordRegister.contentType = TMP_InputField.ContentType.Standard;
+            passwordRegister.ForceLabelUpdate();
+            passwordRegisterConfirm.contentType = TMP_InputField.ContentType.Standard;
+            passwordRegisterConfirm.ForceLabelUpdate();
+            showPasswordRegText.text = "Release to hide the password";
+        }
     }
 
-    public void ButtonIsPressed()
+    public void ButtonUpPasswordRegister()
     {
-            buttonPressed= true;
-    }
-
-    public void ButtonIsNotPressed()
-    {
-            buttonPressed= false;
+        if (!buttonPressed)
+        {
+            passwordRegister.contentType = TMP_InputField.ContentType.Password;
+            passwordRegister.ForceLabelUpdate();
+            passwordRegisterConfirm.contentType = TMP_InputField.ContentType.Password;
+            passwordRegisterConfirm.ForceLabelUpdate();
+            showPasswordRegText.text = "Press to the show Password";
+        }
     }
 
     public void SaveUserData()
     {
         StartCoroutine(UpdateUsernameAuth(userNameChange.text));
         StartCoroutine(UpdateUsernameDatabase(userNameChange.text));
-        StartCoroutine(UpdateUsernameAuth(userName.text));
-        StartCoroutine(UpdateUsernameDatabase(userName.text));
     }
 
-    public void SaveUserStats()
+    public IEnumerator SaveUserStats()
     {
-        Debug.Log("Hatz");
-       StartCoroutine(UpdateScore(int.Parse(userScore.text)));
-       StartCoroutine(UpdatePoints(int.Parse(userPoints.text)));
+        
+        Debug.Log("User stats updated");
+        StartCoroutine(UpdateScore(int.Parse(userScore.text)));
+        StartCoroutine(UpdatePoints(int.Parse(userPoints.text)));
+        yield return null;
     }
 
     private IEnumerator Login(string _email, string _password)
@@ -222,9 +266,12 @@ public class FirebaseManagerAuth : MonoBehaviour
             yield return new WaitForSeconds(1);
             confirmLogin.text = "Loading profile";
             yield return new WaitForSeconds(2);
+            isLoggedIn = true;
+
             userNameChange.text = User.DisplayName;
             userName.text = User.DisplayName;
             confirmLogin.text = "";
+
             StartCoroutine(LoadUserData());
             UiManager.instance.UserProfileTab();
             ClearRegisterFeilds();
@@ -286,7 +333,7 @@ public class FirebaseManagerAuth : MonoBehaviour
                 if (User != null)
                 {
                     //Create a user profile and set the username
-                    UserProfile profile = new UserProfile { DisplayName = _username };
+                    UserProfile profile = new () { DisplayName = _username };
 
                     //Call the Firebase auth update user profile function passing the profile with the username
                     var ProfileTask = User.UpdateUserProfileAsync(profile);
@@ -320,7 +367,7 @@ public class FirebaseManagerAuth : MonoBehaviour
     private IEnumerator UpdateUsernameAuth(string _username)
     {
         //Create a user profile and set the username
-        UserProfile profile = new UserProfile { DisplayName = _username };
+        UserProfile profile = new () { DisplayName = _username };
 
         //Call the Firebase auth update user profile function passing the profile with the username
         var ProfileTask = User.UpdateUserProfileAsync(profile);
@@ -333,7 +380,7 @@ public class FirebaseManagerAuth : MonoBehaviour
         }
         else
         {
-            //Username is  updated
+            Debug.Log("User is updated");
         }
     }
 
@@ -350,7 +397,7 @@ public class FirebaseManagerAuth : MonoBehaviour
         }
         else
         {
-            //Database username is updated
+            Debug.Log("Database is updated");
         }
     }
 
@@ -401,25 +448,25 @@ public class FirebaseManagerAuth : MonoBehaviour
         }
         else if (DBTask.Result.Value == null)
         {
-            //No data exists yet
+            //Default data
+            userName.text = string.Empty;
             userScore.text = "0";
-            userPoints.text = "0";
-            
+            userPoints.text = "50";
         }
         else
         {
             //Data has been retrieved
             DataSnapshot snapshot = DBTask.Result;
 
+            userName.text = snapshot.Child("username").Value.ToString();
             userScore.text = snapshot.Child("score").Value.ToString();
             userPoints.text = snapshot.Child("points").Value.ToString();
-
         }
     }
 
     private IEnumerator LoadLeaderboardData()
     {
-        //Get all the users data ordered by points amount
+        //Get all the users data ordered by score
         var DBTask = Database.Child("users").OrderByChild("score").GetValueAsync();
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
@@ -445,10 +492,11 @@ public class FirebaseManagerAuth : MonoBehaviour
                 string username = childSnapshot.Child("username").Value.ToString();
                 int points = int.Parse(childSnapshot.Child("points").Value.ToString());
                 int score = int.Parse(childSnapshot.Child("score").Value.ToString());
+                int nr = int.Parse(childSnapshot.Child("score").Value.ToString());
 
                 //Instantiate new leaderboard elements
-                //GameObject scoreObj = Instantiate(scoreObj, leaderboardContent);
-                scoreObj.GetComponent<ScoreObj>().NewScoreElement(username, points, score);
+                GameObject leaderboardObj = Instantiate(scoreObj, leaderboardContent);
+                leaderboardObj.GetComponent<ScoreObj>().NewScoreElement(username, score, points, nr);
             }
         }
     }
