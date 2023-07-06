@@ -56,6 +56,6 @@ We welcome contributions to Questify! To contribute, please follow these guideli
 
 ## Feedback and Support
 
-For any questions, suggestions, or issues, please contact us at simdragos@gmail.com. We appreciate your feedback and are committed to improving the app based on user input.
+For any questions, suggestions, or issues, please contact us at simdragos@gmail.com. I appreciate your feedback and are committed to improving the app based on user input.
 
 
