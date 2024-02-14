@@ -1,6 +1,6 @@
 # Questify
 
-Questify is a gamified mobile application developed in Unity, allowing users to embark on exciting quests, earn points, and compete on leaderboards. This README provides an overview of the app's features, installation instructions, and details for contributing to the project.
+Questify is a gamified application developed in Unity, allowing users to embark on exciting quests, earn points, and compete on leaderboards. This README provides an overview of the app's features, installation instructions, and details for contributing to the project.
 
 ## Features
 
